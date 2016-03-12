@@ -60,6 +60,8 @@ public class DataSetImpl implements Dataset {
      * @return
      */
     public boolean load(String userPath,String itemPath,String ratingPath){
+    	long begin = System.currentTimeMillis();
+    	System.out.println("================开始加载数据======================");
     	//加载用户信息数据
     	List<String> dataList = FileUtils.readFileByLine(new File(userPath));
     	for(String line : dataList){
@@ -95,6 +97,8 @@ public class DataSetImpl implements Dataset {
 			User user = allUsers.get(r.getUserId());
 			user.setItemRating(r);
     	}
+    	long end = System.currentTimeMillis();
+    	System.out.println("================数据加载完成,用时:"+(end-begin)+" ms===================");
     	
     	return true;
     }

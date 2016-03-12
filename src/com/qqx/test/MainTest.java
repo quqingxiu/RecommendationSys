@@ -5,13 +5,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.qqx.data.impl.DataConfig;
 import com.qqx.data.impl.DataSetImpl;
 import com.qqx.matrix.ItemBasedSimilarityMatrix;
 import com.qqx.matrix.KNearestNeighbor;
 import com.qqx.model.Item;
 import com.qqx.model.PredictedItemRating;
 import com.qqx.recommend.Delphi;
-import com.qqx.similarity.CosineSimilarity;
+import com.qqx.similarity.PearsonCorrelationCoefficient;
 
 public class MainTest {
 	private static String basePath = System.getProperty("user.dir");
@@ -22,21 +23,21 @@ public class MainTest {
 	public static void main(String[] args) {
 		DataSetImpl ds = new DataSetImpl();
 		
-		ds.load(userPath, itemPath, ratingPath);
-		ds.printRatingMatrix();
+		ds.load(DataConfig.getUserDataFilePath(), DataConfig.getItemDataFilePath(), DataConfig.getRatingTrainDataFilePath());
+//		ds.printRatingMatrix();
 		
-		ItemBasedSimilarityMatrix similarity = new ItemBasedSimilarityMatrix(ds,new CosineSimilarity());
+		ItemBasedSimilarityMatrix similarity = new ItemBasedSimilarityMatrix(ds,new PearsonCorrelationCoefficient());
 //		ItemBasedSimilarityMatrix similarity = new ItemBasedSimilarityMatrix(ds,new JaccardSimilarity());
 		similarity.printSimilarityMatrix();
 		
-		Map<String,Item> map = similarity.getItemSimilarity(4);
-		Set<String> keySet = map.keySet();
-		Iterator<String> iter = keySet.iterator();
-		while (iter.hasNext()) {
-			String key = iter.next();
-			Item item = map.get(key);
-			System.out.println(key + " : " + item.toString());
-		}
+//		Map<String,Item> map = similarity.getItemSimilarity(4);
+//		Set<String> keySet = map.keySet();
+//		Iterator<String> iter = keySet.iterator();
+//		while (iter.hasNext()) {
+//			String key = iter.next();
+//			Item item = map.get(key);
+//			System.out.println(key + " : " + item.toString());
+//		}
 
 		KNearestNeighbor knn = new KNearestNeighbor(similarity);
 //		Set<Integer> set = knn.getKNearestNeigtbor(4);
@@ -46,7 +47,7 @@ public class MainTest {
 		
 		System.out.println("\n======¿ªÊ¼ÍÆ¼ö===============");
 		Delphi delphi = new Delphi(ds, similarity, knn);
-		List<PredictedItemRating> list = delphi.recommend(ds.getUser(2), 2);
+		List<PredictedItemRating> list = delphi.recommend2(ds.getUser(45), 10);
 		for(PredictedItemRating p : list){
 			System.out.println(p.toString());
 		}

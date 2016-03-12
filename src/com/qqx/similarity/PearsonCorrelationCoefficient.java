@@ -6,11 +6,11 @@ import com.qqx.model.Item;
 import com.qqx.model.Rating;
 
 /**
- * 余弦相似度计算实现类
+ * pearson相关系数计算实现类
  * @author qqx
  *
  */
-public class CosineSimilarity implements Similarity {
+public class PearsonCorrelationCoefficient implements Similarity {
 
 	@Override
 	public double calculateSimilarity(Item itemA, Item itemB) {

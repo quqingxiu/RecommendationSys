@@ -28,10 +28,14 @@ public class KNearestNeighbor {
 	private ItemBasedSimilarityMatrix ibsMatrix = null;
 	
 	public KNearestNeighbor(ItemBasedSimilarityMatrix ibsMatrix) {
+		long begin = System.currentTimeMillis();
+		System.out.println("================开始初始化k近邻======================");
 		knn = new HashMap<Integer, Set<Integer>>(ibsMatrix.getnRows());
 		this.ibsMatrix = ibsMatrix;
 		
 		initKNearestNeighbor();
+		long end = System.currentTimeMillis();
+    	System.out.println("==============K近邻初始化完成,用时:"+(end-begin)+" ms=========");
 	}
 	
 	/**

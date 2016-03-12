@@ -29,23 +29,14 @@ public class Delphi {
 	 */
 	private ItemBasedSimilarityMatrix similarity;
 	/**
-	 * 相似度阀值
-	 */
-	private final double similarityThreshold;
-	/**
 	 * k近邻实例
 	 */
 	private KNearestNeighbor knn = null;
 	
-	public Delphi(Dataset dataset, ItemBasedSimilarityMatrix similarity,KNearestNeighbor knn,double similarityThreshold) {
+	public Delphi(Dataset dataset, ItemBasedSimilarityMatrix similarity,KNearestNeighbor knn) {
 		this.dataset = dataset;
 		this.similarity = similarity;
 		this.knn = knn;
-		this.similarityThreshold = similarityThreshold;
-	}
-	
-	public Delphi(Dataset dataset, ItemBasedSimilarityMatrix similarity,KNearestNeighbor knn) {
-		this(dataset, similarity, knn, 0.0);
 	}
 	
 	public List<PredictedItemRating> recommend2(User user, int topN) {
@@ -61,7 +52,7 @@ public class Delphi {
 					recommendations.add(new PredictedItemRating(user.getUserId(), item.getItemId(), predictedRating));
 				}
 			}else{
-				System.out.println("skip Item : "+item.getItemName());
+//				System.out.println("skip Item : "+item.getItemName());
 			}
 		}
 		
@@ -99,42 +90,6 @@ public class Delphi {
 		return weightSimilaritySum / SimilaritySum;
 	}
 	
-	
-	/**
-	 * 为用户推荐前topN项
-	 * @param user
-	 * @param topN
-	 * @return
-	 */
-	public List<PredictedItemRating> recommend(User user, int topN) {
-		List<PredictedItemRating> recommendations = new ArrayList<PredictedItemRating>();
-//		double maxRating = -1.0d;
-		
-		for(Item item : dataset.getItems()){
-			if(!skipItem(user, item)){
-				//预测用户对该项目的评分
-				double predictedRating = estimateItemBasedRating(user,item);
-//				if(predictedRating > maxRating){
-//					maxRating = predictedRating;
-//				}
-				
-				if(!Double.isNaN(predictedRating)){
-					recommendations.add(new PredictedItemRating(user.getUserId(), item.getItemId(), predictedRating));
-				}
-				else{
-					System.out.println("the estimate value is Nan : "+item.getItemName());
-				}
-				
-			}else{
-				System.out.println("skip Item : "+item.getItemName());
-			}
-		}
-		
-		List<PredictedItemRating> topRecommendations = PredictedItemRating.getTopNRecommendations(recommendations, topN);
-		
-		return topRecommendations;
-	}
-	
 	/**
 	 * 判断用户是否对项目评分过
 	 * @param user
@@ -148,47 +103,4 @@ public class Delphi {
         }
         return skipItem;
     }
-
-	/**
-	 * 估计某用户对某项目的评分
-	 * @param user
-	 * @param item
-	 * @return
-	 */
-	public double estimateItemBasedRating(User user,Item item){
-		double estimateRating = Double.NaN;
-		int itemId = item.getItemId();
-		int userId = user.getUserId();
-		double weightedRatingSum = 0.0;	
-		double similaritySum = 0.0;
-		
-		//判断该用户是否给该项目评过分
-		Rating existingRatingByUser = item.getUserRating(user.getUserId());
-		if(existingRatingByUser != null){
-			estimateRating = existingRatingByUser.getRating();
-		}else{	//对用户未评分项目进行估值
-			double similarityBetweenItems = 0.0;	//项目之间的相似度
-			double weightedRating = 0.0;	
-			
-			for(Item anotherItem : dataset.getItems()){
-				//只考虑该用户打过分的条目
-				Rating anotherItemRating = anotherItem.getUserRating(userId);
-				if(anotherItemRating != null){
-					similarityBetweenItems = similarity.getSimilarityValues(itemId, anotherItem.getItemId());
-					if(similarityBetweenItems > similarityThreshold){
-						weightedRating += similarityBetweenItems * anotherItemRating.getRating();
-						weightedRatingSum += weightedRating;
-						similaritySum += similarityBetweenItems;
-					}
-				}
-			}
-			
-			if(similaritySum > 0.0){
-				estimateRating = weightedRatingSum / similaritySum;
-			}
-		}
-		
-		return estimateRating;
-	}
-
 }

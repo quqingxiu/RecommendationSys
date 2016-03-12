@@ -29,10 +29,14 @@ public class ItemBasedSimilarityMatrix {
 	private int nRows;
 	
 	public ItemBasedSimilarityMatrix(Dataset dataSet,Similarity similarity) {
+		long begin = System.currentTimeMillis();
+		System.out.println("================开始初始化相似度矩阵======================");
 		this.similarityInter = similarity;
 		this.dataSet = dataSet;
 		this.nRows = dataSet.getItemCount();
 		calculate();
+		long end = System.currentTimeMillis();
+    	System.out.println("==============相似度矩阵初始化完成,用时:"+(end-begin)+" ms=========");
 	}
 
 	/**
@@ -68,7 +72,9 @@ public class ItemBasedSimilarityMatrix {
 			System.out.println("相似度矩阵为空！");
 		}else{
 			System.out.println("==============相似度矩阵===============");
-			for(int i=0,len=similarityMatrix.length;i<len;i++){
+//			for(int i=0,len=similarityMatrix.length;i<len;i++){
+			for(int i=6,len=11;i<len;i++){
+//				for(int j=0;j<similarityMatrix[i].length;j++){
 				for(int j=0;j<similarityMatrix[i].length;j++){
 					System.out.print(df.format(similarityMatrix[i][j])+" ");
 				}
